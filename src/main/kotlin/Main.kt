@@ -3,22 +3,26 @@ fun main(args: Array<String>) {
     val discount = 0.75
     var accountOne = 1000
     var accountTwo = 0
-    var amount = 200
-    if (amount >= 35) {
-        accountOne = accountOne - amount
-        amount = (amount * discount).toInt()
+    var amount = 300
+
+    val commission = if (amount >= 35) (amount * discount).toInt() else 35
+    val totalAmount = if (amount >= 35) amount + commission else amount + commission
+
+    if (totalAmount <= accountOne) {
+        accountOne -= totalAmount
+        accountTwo += amount
+        println("Сумма перевода составила: $amount")
+        println("Комиссия составила: $commission")
+        println("Счет 1: $accountOne")
+        println("Счет 2: $accountTwo")
     } else {
-        accountOne = accountOne - amount
+        println("Недостаточно средств на счете для перевода")
     }
-    accountTwo = accountTwo + amount
-    println("Сумма перевода составила: " + amount)
-    println("Счет 1: " + accountOne)
-    println("Счет 2: " + accountTwo)
 
     print("Задание - 2 (Людишки): ")
-    val likes = 41
+    val likes = 2601
     var people = ""
-    if (1 == likes % 10) {
+    if (1 == likes % 10 && 11 !== likes && 11 !== likes % 100) {
         people = "человеку"
     } else {
         people = "людям"
