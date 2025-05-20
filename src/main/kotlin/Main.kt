@@ -1,12 +1,12 @@
 fun main(args: Array<String>) {
-    print("Задание - 1 (Денежные переводы): ")
-    val discount = 0.75
+    println("Задание - 1 (Денежные переводы): ")
+    val discount = 0.0075
     var accountOne = 1000
     var accountTwo = 0
     var amount = 300
 
-    val commission = if (amount >= 35) (amount * discount).toInt() else 35
-    val totalAmount = if (amount >= 35) amount + commission else amount + commission
+    val commission = if (amount * discount >= 35) (amount * discount).toInt() else 35
+    val totalAmount = amount + commission
 
     if (totalAmount <= accountOne) {
         accountOne -= totalAmount
@@ -18,6 +18,7 @@ fun main(args: Array<String>) {
     } else {
         println("Недостаточно средств на счете для перевода")
     }
+
 
     print("Задание - 2 (Людишки): ")
     val likes = 2601
