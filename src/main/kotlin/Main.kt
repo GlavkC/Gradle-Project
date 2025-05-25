@@ -1,45 +1,78 @@
 fun main(args: Array<String>) {
-    println("Задание - 1 (Денежные переводы): ")
-    val discount = 0.0075
-    var accountOne = 1000
-    var accountTwo = 0
-    var amount = 300
-
-    val commission = if (amount * discount >= 35) (amount * discount).toInt() else 35
-    val totalAmount = amount + commission
-
-    if (totalAmount <= accountOne) {
-        accountOne -= totalAmount
-        accountTwo += amount
-        println("Сумма перевода составила: $amount")
-        println("Комиссия составила: $commission")
-        println("Счет 1: $accountOne")
-        println("Счет 2: $accountTwo")
-    } else {
-        println("Недостаточно средств на счете для перевода")
-    }
-
-
-    print("Задание - 2 (Людишки): ")
-    val likes = 2601
-    var people = ""
-    if (1 == likes % 10 && 11 !== likes && 11 !== likes % 100) {
-        people = "человеку"
-    } else {
-        people = "людям"
-    }
-    println("Понравилось $likes $people")
-
-    print("Задание - 3 (Меломан): ")
-    val specalСustomer = true //false
-    val buySumm = 10_001
-    var result = 0
-    if (buySumm <= 1000) { result = buySumm }
-    if (buySumm <= 10000) { result = buySumm - 100 }
-    if (buySumm > 10000) { result = (buySumm * 0.95).toInt() }
-    if (specalСustomer == true) {
-        result = (result * 0.99).toInt()
-        print("Скидка Особому! покупателю дополнительно 1% - ")
-    }
-    print("стоймость покупки составила - $result")
+    //задание 1
+    var second = (0..260700).random() //от 0 до 3 дней + 1500 секунд !в секундах!
+    println(second)
+    println(frend(second))
+    //задание 2
+    val listcards = listOf("Mastercard", "Visa", "Мир")
+    val randomCard = listcards.random()
+    val listdata = listOf("day", "month")
+    val randomData = listdata.random()
+    println(translations((0..750000).random(), randomCard, randomData))
 }
+    //задание 1 (функции)
+fun frend(seconds: Int): String {
+    return when {
+        seconds <= 60 -> "был(а) только что"
+        seconds <= 60 * 60 -> {
+            val minutes = seconds / 60
+            "был(а) ${minutes} ${minute(minutes)} назад"
+        }
+        seconds <= 24 * 60 * 60 -> {
+            val hours = seconds / (60 * 60)
+            "был(а) ${hours} ${hour(hours)} назад"
+        }
+        seconds <= 2 * 24 * 60 * 60 -> "был(а) вчера"
+        seconds <= 3 * 24 * 60 * 60 -> "был(а) позавчера"
+        else -> "был(а) давно"
+    }
+}
+
+fun minute(minutes: Int): String {
+    return when {
+        minutes % 100 in 11..14 -> "минут"
+        minutes % 10 == 1 -> "минуту"
+        minutes % 10 in 2..4 -> "минуты"
+        else -> "минут"
+    }
+}
+
+fun hour(hours: Int): String {
+    return when {
+        hours % 100 in 11..20 -> "часов"
+        hours % 10 == 1 -> "час"
+        hours % 10 in 2..4 -> "часа"
+        else -> "часов"
+    }
+}
+    //задание 2 (функции)
+    fun translations(money: Int, card: String, data: String): Any {
+        var max = if (data == "day") {
+              150000
+        }   else {
+              600000
+        }
+        val commission = when (card) {
+            "Mastercard" -> {
+                if (money > 75000) {
+                    (money - 75000) * 0.006 + 20
+                } else {
+                    0.0
+                }
+            }
+            "Visa" -> {
+                val calculated = money * 0.0075
+                if (calculated < 35) 35.0 else calculated
+            }
+            "Мир" -> 0.0
+            else -> return "Ошибка: неизвестный тип карты"
+        }
+        val total = money + commission.toInt()
+
+        return if (max > money) {
+                "Сумма перевода: $money руб., комиссия: ${commission.toInt()} руб. (${card}), итого: $total руб."
+            } else {
+                "Слишком большая сумма"
+            }
+        }
+
