@@ -8,9 +8,10 @@ fun main(args: Array<String>) {
     val randomCard = listcards.random()
     val listdata = listOf("day", "month")
     val randomData = listdata.random()
-    println(translations((0..750000).random(), randomCard, randomData))
+    println(translations((0..200000).random(), randomCard, (0..600000).random(), randomData))
 }
-    //задание 1 (функции)
+
+//задание 1 (функции) - оставляем без изменений
 fun frend(seconds: Int): String {
     return when {
         seconds <= 60 -> "был(а) только что"
@@ -45,34 +46,39 @@ fun hour(hours: Int): String {
         else -> "часов"
     }
 }
-    //задание 2 (функции)
-    fun translations(money: Int, card: String, data: String): Any {
-        var max = if (data == "day") {
-              150000
-        }   else {
-              600000
-        }
-        val commission = when (card) {
-            "Mastercard" -> {
-                if (money > 75000) {
-                    (money - 75000) * 0.006 + 20
-                } else {
-                    0.0
-                }
-            }
-            "Visa" -> {
-                val calculated = money * 0.0075
-                if (calculated < 35) 35.0 else calculated
-            }
-            "Мир" -> 0.0
-            else -> return "Ошибка: неизвестный тип карты"
-        }
-        val total = money + commission.toInt()
 
-        return if (max > money) {
-                "Сумма перевода: $money руб., комиссия: ${commission.toInt()} руб. (${card}), итого: $total руб."
-            } else {
-                "Слишком большая сумма"
+//задание 2 (функции)
+fun translations(
+    money: Int,
+    card: String = "Мир",
+    previousTransfers: Int,
+    data: String = "month"
+): String {
+    val dayLimit = 150000
+    val monthLimit = 600000
+    if (money > dayLimit && data == "day") {
+        return "Слишком большая сумма: превышен дневной лимит"
+    }
+    if (money + previousTransfers > monthLimit) {
+        return "Слишком большая сумма: превышен месячный лимит"
+    }
+
+    val commission = when (card) {
+        "Mastercard" -> {
+            when {
+                previousTransfers + money <= 75000 -> 0.0
+                previousTransfers >= 75000 -> money * 0.006 + 20
+                else -> (money + previousTransfers - 75000) * 0.006 + 20
             }
         }
+        "Visa" -> {
+            val calculated = money * 0.0075
+            if (calculated < 35) 35.0 else calculated
+        }
+        "Мир" -> 0.0
+        else -> return "Ошибка: неизвестный тип карты"
+    }
 
+    val total = money + commission.toInt()
+    return "Сумма перевода: $money руб., комиссия: ${commission.toInt()} руб. (${card}), итого: $total руб."
+}
