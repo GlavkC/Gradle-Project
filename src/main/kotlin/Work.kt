@@ -64,4 +64,23 @@ object WallService {
         posts = emptyArray()
         nextId = 1
     }
+
+
+}
+
+fun main() {
+    WallService.clear()
+
+    val post = Post(
+        ownerId = 1,
+        fromId = 1,
+        date = System.currentTimeMillis(),
+        text = "Первый пост"
+    )
+
+    val addedPost = WallService.add(post)
+    println("Добавлен пост с ID: ${addedPost.id}")
+
+    val updateResult = WallService.update(addedPost.copy(text = "Обновлённый текст"))
+    println("Результат обновления: $updateResult")
 }
