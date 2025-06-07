@@ -9,12 +9,12 @@ class WallServiceTest {
     }
 
     @Test
-    fun testAddShouldSetNonZeroId() {
+    fun addShouldSetNonZeroId() {
         val post = Post(
             ownerId = 1,
             fromId = 1,
             date = System.currentTimeMillis(),
-            text = "Тестовый Пост"
+            text = "Тестовый пост"
         )
 
         val result = WallService.add(post)
@@ -22,7 +22,7 @@ class WallServiceTest {
     }
 
     @Test
-    fun testUpdateExistingPostReturnsTrue() {
+    fun updateExistingPostReturnsTrue() {
         val post1 = WallService.add(
             Post(
                 ownerId = 1,
@@ -31,21 +31,13 @@ class WallServiceTest {
                 text = "Пост 1"
             )
         )
-        val post2 = WallService.add(
-            Post(
-                ownerId = 2,
-                fromId = 2,
-                date = System.currentTimeMillis(),
-                text = "Пост 2"
-            )
-        )
-        val update = post1.copy(text = "Текст")
-        val result = WallService.update(update)
-        assertTrue(result)
+
+        val updatedPost = post1.copy(text = "Обновленный текст")
+        assertTrue(WallService.update(updatedPost))
     }
 
     @Test
-    fun testUpdateNonExistingPostReturnsFalse() {
+    fun updateNonExistingPostReturnsFalse() {
         WallService.add(
             Post(
                 ownerId = 1,
@@ -54,25 +46,15 @@ class WallServiceTest {
                 text = "Пост 1"
             )
         )
-        WallService.add(
-            Post(
-                ownerId = 2,
-                fromId = 2,
-                date = System.currentTimeMillis(),
-                text = "Пост 2"
-            )
-        )
 
         val nonExistingPost = Post(
-            id = 100,
-            ownerId = 100,
-            fromId = 100,
+            id = 999,
+            ownerId = 1,
+            fromId = 1,
             date = System.currentTimeMillis(),
-            text = "Пост"
+            text = "Несуществующий пост"
         )
 
-        val result = WallService.update(nonExistingPost)
-
-        assertFalse(result)
+        assertFalse(WallService.update(nonExistingPost))
     }
 }
