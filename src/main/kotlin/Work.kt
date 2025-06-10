@@ -44,61 +44,85 @@ data class Views(
 sealed class Attachment {
     abstract val type: String
 
-    data class Photo(
-        val id: Int,
-        val ownerId: Int,
-        val photo130: String,
-        val photo604: String
+    data class PhotoAttachment(
+        val photo: Photo
     ) : Attachment() {
         override val type = "photo"
     }
 
-    data class Video(
-        val id: Int,
-        val ownerId: Int,
-        val title: String,
-        val duration: Int
+    data class VideoAttachment(
+        val video: Video
     ) : Attachment() {
         override val type = "video"
     }
 
-    data class Audio(
-        val id: Int,
-        val ownerId: Int,
-        val artist: String,
-        val title: String,
-        val duration: Int
+    data class AudioAttachment(
+        val audio: Audio
     ) : Attachment() {
         override val type = "audio"
     }
 
-    data class Document(
-        val id: Int,
-        val ownerId: Int,
-        val title: String,
-        val size: Int,
-        val ext: String
+    data class DocumentAttachment(
+        val doc: Document
     ) : Attachment() {
         override val type = "doc"
     }
 
-    data class Link(
-        val url: String,
-        val title: String,
-        val description: String
+    data class LinkAttachment(
+        val link: Link
     ) : Attachment() {
         override val type = "link"
     }
 
-    data class Poll(
-        val id: Int,
-        val ownerId: Int,
-        val question: String,
-        val votes: Int
+    data class PollAttachment(
+        val poll: Poll
     ) : Attachment() {
         override val type = "poll"
     }
 }
+
+data class Photo(
+    val id: Int,
+    val ownerId: Int,
+    val photo130: String,
+    val photo604: String
+)
+
+data class Video(
+    val id: Int,
+    val ownerId: Int,
+    val title: String,
+    val duration: Int
+)
+
+data class Audio(
+    val id: Int,
+    val ownerId: Int,
+    val artist: String,
+    val title: String,
+    val duration: Int
+)
+
+data class Document(
+    val id: Int,
+    val ownerId: Int,
+    val title: String,
+    val size: Int,
+    val ext: String
+)
+
+data class Link(
+    val url: String,
+    val title: String,
+    val description: String
+)
+
+data class Poll(
+    val id: Int,
+    val ownerId: Int,
+    val question: String,
+    val votes: Int
+)
 
 object WallService {
     private var posts = emptyArray<Post>()
@@ -131,11 +155,13 @@ object WallService {
 fun main() {
     WallService.clear()
 
-    val photoAttachment = Attachment.Photo(
-        id = 1,
-        ownerId = 1,
-        photo130 = "https://example.com/photo130.jpg",
-        photo604 = "https://example.com/photo604.jpg"
+    val photoAttachment = Attachment.PhotoAttachment(
+        Photo(
+            id = 1,
+            ownerId = 1,
+            photo130 = "https://example.com/photo130.jpg",
+            photo604 = "https://example.com/photo604.jpg"
+        )
     )
 
     val post = Post(
@@ -160,23 +186,23 @@ fun processAttachments(post: Post) {
     println("\nОбработка вложений для поста ${post.id}:")
     post.attachments?.forEach { attachment ->
         when (attachment) {
-            is Attachment.Photo -> {
-                println("Фото (${attachment.photo604})")
+            is Attachment.PhotoAttachment -> {
+                println("Фото (${attachment.photo.photo604})")
             }
-            is Attachment.Video -> {
-                println("Видео: ${attachment.title} (${attachment.duration} сек)")
+            is Attachment.VideoAttachment -> {
+                println("Видео: ${attachment.video.title} (${attachment.video.duration} сек)")
             }
-            is Attachment.Audio -> {
-                println("Аудио: ${attachment.artist} - ${attachment.title}")
+            is Attachment.AudioAttachment -> {
+                println("Аудио: ${attachment.audio.artist} - ${attachment.audio.title}")
             }
-            is Attachment.Document -> {
-                println("Документ: ${attachment.title}.${attachment.ext} (${attachment.size} байт)")
+            is Attachment.DocumentAttachment -> {
+                println("Документ: ${attachment.doc.title}.${attachment.doc.ext} (${attachment.doc.size} байт)")
             }
-            is Attachment.Link -> {
-                println("Ссылка: ${attachment.title} (${attachment.url})")
+            is Attachment.LinkAttachment -> {
+                println("Ссылка: ${attachment.link.title} (${attachment.link.url})")
             }
-            is Attachment.Poll -> {
-                println("Опрос: ${attachment.question} (${attachment.votes} голосов)")
+            is Attachment.PollAttachment -> {
+                println("Опрос: ${attachment.poll.question} (${attachment.poll.votes} голосов)")
             }
         }
     } ?: println("Вложения отсутствуют")

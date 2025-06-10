@@ -36,11 +36,13 @@ class WallServiceTest {
 
     @Test
     fun `post with photo attachment should store correctly`() {
-        val photo = Attachment.Photo(
-            id = 1,
-            ownerId = 1,
-            photo130 = "small.jpg",
-            photo604 = "large.jpg"
+        val photoAttachment = Attachment.PhotoAttachment(
+            Photo(
+                id = 1,
+                ownerId = 1,
+                photo130 = "small.jpg",
+                photo604 = "large.jpg"
+            )
         )
 
         val post = Post(
@@ -48,7 +50,7 @@ class WallServiceTest {
             fromId = 1,
             date = System.currentTimeMillis(),
             text = "Post with photo",
-            attachments = arrayOf(photo)
+            attachments = arrayOf(photoAttachment)
         )
 
         val addedPost = WallService.add(post)
@@ -57,18 +59,18 @@ class WallServiceTest {
         assertEquals(1, addedPost.attachments?.size)
         assertEquals("photo", addedPost.attachments?.get(0)?.type)
 
-        val storedPhoto = addedPost.attachments?.get(0) as? Attachment.Photo
+        val storedPhoto = addedPost.attachments?.get(0) as? Attachment.PhotoAttachment
         assertNotNull(storedPhoto)
-        assertEquals("large.jpg", storedPhoto?.photo604)
+        assertEquals("large.jpg", storedPhoto?.photo?.photo604)
     }
 
     @Test
     fun `when using sealed class no else branch needed in when`() {
-        val photo = Attachment.Photo(1, 1, "small.jpg", "large.jpg")
-        val video = Attachment.Video(1, 1, "Cool video", 120)
+        val photoAttachment = Attachment.PhotoAttachment(Photo(1, 1, "small.jpg", "large.jpg"))
+        val videoAttachment = Attachment.VideoAttachment(Video(1, 1, "Cool video", 120))
 
-        val result1 = processAttachment(photo)
-        val result2 = processAttachment(video)
+        val result1 = processAttachment(photoAttachment)
+        val result2 = processAttachment(videoAttachment)
 
         assertEquals("Photo: large.jpg", result1)
         assertEquals("Video: Cool video (120 sec)", result2)
@@ -76,11 +78,11 @@ class WallServiceTest {
 
     private fun processAttachment(attachment: Attachment): Any {
         return when (attachment) {
-            is Attachment.Photo -> "Photo: ${attachment.photo604}"
-            is Attachment.Video -> "Video: ${attachment.title} (${attachment.duration} sec)"
-            is Attachment.Audio -> "Audio: ${attachment.artist} - ${attachment.title}"
-            is Attachment.Document -> "Document: ${attachment.title}.${attachment.ext}"
-            is Attachment.Link -> "Link: ${attachment.title}"
+            is Attachment.PhotoAttachment -> "Photo: ${attachment.photo.photo604}"
+            is Attachment.VideoAttachment -> "Video: ${attachment.video.title} (${attachment.video.duration} sec)"
+            is Attachment.AudioAttachment -> "Audio: ${attachment.audio.artist} - ${attachment.audio.title}"
+            is Attachment.DocumentAttachment -> "Document: ${attachment.doc.title}.${attachment.doc.ext}"
+            is Attachment.LinkAttachment -> "Link: ${attachment.link.title}"
             else -> {}
         }
     }
