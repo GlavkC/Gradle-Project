@@ -1,89 +1,75 @@
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.Test
+import org.junit.Assert.*
+import org.junit.Before
 
 class WallServiceTest {
-    @BeforeEach
-    fun clearBeforeTest() {
-        WallService.clear()
+    private val service = WallService()
+
+    @Before
+    fun setUp() {
+        service.clear()
     }
 
     @Test
-    fun `add should set non-zero id`() {
+    fun createComment_shouldAddCommentToExistingPost() {
         val post = Post(
+            id = 1,
             ownerId = 1,
             fromId = 1,
-            date = System.currentTimeMillis(),
-            text = "Test post"
+            createdBy = 1,
+            date = 1,
+            text = "Тест поста",
+            replyOwnerId = 0,
+            replyPostId = 0,
+            friendsOnly = false,
+            comments = Comments(0, true, false, false, false),
+            copyright = Copyright(0, "", "", ""),
+            likes = Likes(0, false, true, true),
+            reposts = Reposts(0, false),
+            views = Views(0),
+            postType = "пост",
+            signerId = 0,
+            canPin = true,
+            canDelete = true,
+            canEdit = true,
+            isPinned = false,
+            markedAsAds = false,
+            isFavorite = false,
+            postponedId = 0
         )
-        val result = WallService.add(post)
+        service.addPost(post)
+
+        val comment = Comment(
+            id = 0,
+            fromId = 1,
+            date = 1,
+            text = "Тест комента",
+            replyToUser = 0,
+            replyToComment = 0,
+            attachments = emptyArray(),
+            parentsStack = emptyArray(),
+            thread = Thread(0, emptyArray(), true, true, false)
+        )
+
+        val result = service.createComment(post.id, comment)
         assertNotEquals(0, result.id)
+        assertEquals(comment.text, result.text)
     }
 
-    @Test
-    fun `update existing post returns true`() {
-        val post = WallService.add(
-            Post(
-                ownerId = 1,
-                fromId = 1,
-                date = System.currentTimeMillis(),
-                text = "Original post"
-            )
-        )
-        val updatedPost = post.copy(text = "Updated text")
-        assertTrue(WallService.update(updatedPost))
-    }
-
-    @Test
-    fun `post with photo attachment should store correctly`() {
-        val photoAttachment = Attachment.PhotoAttachment(
-            Photo(
-                id = 1,
-                ownerId = 1,
-                photo130 = "small.jpg",
-                photo604 = "large.jpg"
-            )
-        )
-
-        val post = Post(
-            ownerId = 1,
+    @Test(expected = PostNotFoundException::class)
+    fun createComment_shouldThrowWhenPostNotFound() {
+        val comment = Comment(
+            id = 0,
             fromId = 1,
-            date = System.currentTimeMillis(),
-            text = "Post with photo",
-            attachments = arrayOf(photoAttachment)
+            date = 1,
+            text = "Тест комента",
+            replyToUser = 0,
+            replyToComment = 0,
+            attachments = emptyArray(),
+            parentsStack = emptyArray(),
+            thread = Thread(0, emptyArray(), true, true, false)
         )
 
-        val addedPost = WallService.add(post)
-
-        assertNotNull(addedPost.attachments)
-        assertEquals(1, addedPost.attachments?.size)
-        assertEquals("photo", addedPost.attachments?.get(0)?.type)
-
-        val storedPhoto = addedPost.attachments?.get(0) as? Attachment.PhotoAttachment
-        assertNotNull(storedPhoto)
-        assertEquals("large.jpg", storedPhoto?.photo?.photo604)
-    }
-
-    @Test
-    fun `when using sealed class no else branch needed in when`() {
-        val photoAttachment = Attachment.PhotoAttachment(Photo(1, 1, "small.jpg", "large.jpg"))
-        val videoAttachment = Attachment.VideoAttachment(Video(1, 1, "Cool video", 120))
-
-        val result1 = processAttachment(photoAttachment)
-        val result2 = processAttachment(videoAttachment)
-
-        assertEquals("Photo: large.jpg", result1)
-        assertEquals("Video: Cool video (120 sec)", result2)
-    }
-
-    private fun processAttachment(attachment: Attachment): Any {
-        return when (attachment) {
-            is Attachment.PhotoAttachment -> "Photo: ${attachment.photo.photo604}"
-            is Attachment.VideoAttachment -> "Video: ${attachment.video.title} (${attachment.video.duration} sec)"
-            is Attachment.AudioAttachment -> "Audio: ${attachment.audio.artist} - ${attachment.audio.title}"
-            is Attachment.DocumentAttachment -> "Document: ${attachment.doc.title}.${attachment.doc.ext}"
-            is Attachment.LinkAttachment -> "Link: ${attachment.link.title}"
-            else -> {}
-        }
+        service.createComment(999, comment)
     }
 }
